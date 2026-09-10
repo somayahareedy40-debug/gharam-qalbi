@@ -7,60 +7,70 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
+      --bg: #0d1117;
+      --card: #161b22;
       --primary: #e11d48;
       --accent: #f43f5e;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --text: #f0f6fc;
+      --muted: #8b949e;
+      --border: #30363d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
     
-    header { background: #020617; padding: 1rem; text-align: center; border-bottom: 1px solid #334155; font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+    header { background: #010409; padding: 1rem; text-align: center; border-bottom: 1px solid var(--border); font-size: 1.6rem; font-weight: bold; color: var(--primary); }
     
-    .nav { display: flex; justify-content: center; gap: 8px; background: #0f172a; padding: 0.8rem; border-bottom: 1px solid #1e293b; overflow-x: auto; }
-    .nav button { background: transparent; border: 1px solid #334155; color: var(--text); padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: 0.3s; white-space: nowrap; }
-    .nav button.active, .nav button:hover { background: var(--primary); border-color: var(--primary); }
+    .nav { display: flex; justify-content: center; gap: 8px; background: var(--card); padding: 0.8rem; border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .nav button { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: 0.3s; white-space: nowrap; font-size: 0.9rem; }
+    .nav button.active, .nav button:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-    main { flex: 1; padding: 1.5rem; max-width: 600px; width: 100%; margin: 0 auto; }
-    .page { display: none; background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #334155; }
+    main { flex: 1; padding: 1.5rem; max-width: 650px; width: 100%; margin: 0 auto; }
+    .page { display: none; background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
     .page.active { display: block; }
 
-    h2 { margin-bottom: 1rem; color: var(--accent); }
+    h2 { margin-bottom: 1rem; color: var(--accent); font-size: 1.3rem; }
     .form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 5px; }
-    label { font-size: 0.9rem; color: var(--muted); }
-    input, select, textarea { padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; width: 100%; }
+    label { font-size: 0.85rem; color: var(--muted); }
+    input, select, textarea { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: #fff; width: 100%; outline: none; }
     
-    .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1rem; font-weight: bold; }
+    .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
     .btn:hover { background: var(--accent); }
 
-    .room-card { background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .room-card:hover { border-color: var(--primary); }
+    .room-card { background: var(--bg); padding: 1rem; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .room-card:hover { border-color: var(--primary); transform: translateY(-2px); }
 
-    .chat-box { height: 300px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; padding: 10px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .msg { background: #1e293b; padding: 8px 12px; border-radius: 8px; max-width: 80%; width: fit-content; }
-    .msg-user { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 2px; }
+    .user-card { display: flex; align-items: center; gap: 12px; background: var(--bg); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; }
+    .status-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; }
+
+    .chat-box { height: 320px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); padding: 12px; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { background: var(--card); padding: 8px 12px; border-radius: 8px; max-width: 80%; width: fit-content; border: 1px solid var(--border); }
+    .msg-user { font-size: 0.75rem; color: var(--accent); font-weight: bold; margin-bottom: 3px; }
   </style>
 </head>
 <body>
 
   <header>شات غرام قلبي 💬</header>
 
+  <!-- شريط التنقل الأساسي -->
   <nav class="nav">
     <button onclick="showPage('home')" id="nav-home" class="active">الرئيسية</button>
     <button onclick="showPage('login')" id="nav-login">الدخول</button>
-    <button onclick="showPage('register')" id="nav-register">تسجيل حساب</button>
+    <button onclick="showPage('register')" id="nav-register">إنشاء حساب</button>
     <button onclick="showPage('rooms')" id="nav-rooms">الغرف</button>
-    <button onclick="showPage('profile')" id="nav-profile">الملف الشخصي</button>
+    <button onclick="showPage('users')" id="nav-users">المستخدمين</button>
+    <button onclick="showPage('profile')" id="nav-profile">البروفايل</button>
   </nav>
 
   <main>
     <!-- 1. الصفحة الرئيسية -->
     <section id="home" class="page active">
       <h2>أهلاً بك في شات غرام قلبي</h2>
-      <p style="margin-bottom: 1.5rem; color: var(--muted);">المكان الأفضل للتعرف والتواصل العربي الراقي.</p>
-      <button class="btn" onclick="showPage('register')">أنشئ حسابك الآن وابدأ الشات</button>
+      <p style="margin-bottom: 1.5rem; color: var(--muted); font-size:0.95rem;">مجتمع عربي راقي للتعرف والتواصل والمحادثات الحية.</p>
+      <button class="btn" onclick="showPage('register')" style="margin-bottom: 10px;">دخول الشات (إنشاء حساب)</button>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn" style="background:var(--border);" onclick="showPage('rooms')">تصفح الغرف</button>
+        <button class="btn" style="background:var(--border);" onclick="showPage('users')">المستخدمين</button>
+      </div>
     </section>
 
     <!-- 2. تسجيل الدخول -->
@@ -68,11 +78,11 @@
       <h2>تسجيل الدخول</h2>
       <div class="form-group">
         <label>اسم المستخدم</label>
-        <input type="text" id="login-username" placeholder="اكتب اسمك">
+        <input type="text" placeholder="اكتب اسمك">
       </div>
       <div class="form-group">
         <label>كلمة المرور</label>
-        <input type="password" id="login-password" placeholder="••••••••">
+        <input type="password" placeholder="••••••••">
       </div>
       <button class="btn" onclick="showPage('rooms')">دخول</button>
     </section>
@@ -82,26 +92,26 @@
       <h2>إنشاء حساب جديد</h2>
       <div class="form-group">
         <label>اسم المستخدم</label>
-        <input type="text" id="reg-username" placeholder="مثال: خالد">
+        <input type="text" placeholder="مثال: خالد">
       </div>
       <div class="form-group">
         <label>كلمة المرور</label>
-        <input type="password" id="reg-password">
+        <input type="password">
       </div>
       <div class="form-group">
         <label>العمر</label>
-        <input type="number" id="reg-age" placeholder="20">
+        <input type="number" placeholder="22">
       </div>
       <div class="form-group">
         <label>النوع</label>
-        <select id="reg-gender">
+        <select>
           <option>ذكر</option>
           <option>أنثى</option>
         </select>
       </div>
       <div class="form-group">
         <label>نبذة شخصية</label>
-        <textarea id="reg-bio" placeholder="اكتب القليل عن نفسك..."></textarea>
+        <textarea placeholder="اكتب القليل عن نفسك..."></textarea>
       </div>
       <button class="btn" onclick="showPage('profile')">إنشاء الحساب</button>
     </section>
@@ -111,47 +121,67 @@
       <h2>غرف الشات الحية</h2>
       <div class="room-card" onclick="enterRoom('💬 الغرفة العامة')">
         <span>💬 الغرفة العامة</span>
-        <small style="color:var(--muted)">ادخل الآن</small>
+        <small style="color:var(--muted)">انضم الآن ➔</small>
       </div>
       <div class="room-card" onclick="enterRoom('🌙 غرفة السهر')">
         <span>🌙 غرفة السهر</span>
-        <small style="color:var(--muted)">ادخل الآن</small>
+        <small style="color:var(--muted)">انضم الآن ➔</small>
       </div>
       <div class="room-card" onclick="enterRoom('🎀 غرفة البنات')">
         <span>🎀 غرفة البنات</span>
-        <small style="color:var(--muted)">ادخل الآن</small>
+        <small style="color:var(--muted)">انضم الآن ➔</small>
       </div>
       <div class="room-card" onclick="enterRoom('🎮 غرفة الترفيه')">
         <span>🎮 غرفة الترفيه</span>
-        <small style="color:var(--muted)">ادخل الآن</small>
+        <small style="color:var(--muted)">انضم الآن ➔</small>
       </div>
     </section>
 
-    <!-- 5. واجهة الشات -->
+    <!-- 5. واجهة الشات (تفتح عند الضغط على غرفة) -->
     <section id="chat" class="page">
-      <h2 id="current-room-title">الغرفة</h2>
+      <h2 id="current-room-title">الغرفة العامة</h2>
       <div class="chat-box" id="chat-messages">
-        <div class="msg"><div class="msg-user">النظام</div>مرحباً بك في الغرفة!</div>
+        <div class="msg"><div class="msg-user">النظام</div>مرحباً بك في الغرفة! (ملاحظة: الربط الحقيقي للرسائل بقاعدة البيانات سيكون في المرحلة القادمة).</div>
       </div>
       <div style="display:flex; gap: 8px;">
-        <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا...">
-        <button class="btn" style="width: 80px;" onclick="sendMsg()">إرسال</button>
+        <input type="text" id="chat-input" placeholder="اكتب رسالتك...">
+        <button class="btn" style="width: 90px;" onclick="sendMsg()">إرسال</button>
       </div>
     </section>
 
-    <!-- 6. الملف الشخصي -->
+    <!-- 6. قائمة المستخدمين -->
+    <section id="users" class="page">
+      <h2>قائمة المتواجدين حالياً</h2>
+      <div class="user-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>أحمد (تجريبي)</strong>
+          <p style="font-size:0.75rem; color:var(--muted)">متصل الآن</p>
+        </div>
+      </div>
+      <div class="user-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>سارة (تجريبي)</strong>
+          <p style="font-size:0.75rem; color:var(--muted)">متصل الآن</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. البروفايل -->
     <section id="profile" class="page">
       <h2>الملف الشخصي</h2>
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:2rem;">👤</div>
-        <h3 id="prof-name">اسم المستخدم</h3>
-        <p style="color:var(--muted); font-size:0.9rem;" id="prof-info">العمر: -- | الجنس: --</p>
+      <div style="text-align: center; margin-bottom: 1.2rem;">
+        <div style="width:70px; height:70px; background:var(--primary); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:#fff;">👤</div>
+        <h3 id="prof-name">اسم المستخدم التجريبي</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-top:4px;">العمر: 22 | النوع: ذكر</p>
+        <span style="display:inline-block; background:#16a34a; color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:12px; margin-top:6px;">متصل</span>
       </div>
       <div class="form-group">
         <label>النبذة الشخصية</label>
-        <p id="prof-bio" style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155;">أهلاً بكم في بروفايلي</p>
+        <p style="background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:0.9rem;">أهلاً بكم في بروفايلي الخاص على شات غرام قلبي!</p>
       </div>
-      <button class="btn" onclick="alert('سيتم تفعيل حفظ التعديلات في الخطوة القادمة')">تعديل الملف الشخصي</button>
+      <button class="btn" onclick="alert('سيفعل حفظ التعديلات فور ربطه بالـ Supabase Database')">تعديل البروفايل</button>
     </section>
   </main>
 
