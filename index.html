@@ -1,69 +1,195 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شات غرام قلبي</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2b1055, #7597de);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            color: #ff4b2b;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #e0e0e0;
-        }
-        .btn {
-            display: inline-block;
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            border: none;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شات غرام قلبي</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --primary: #e11d48;
+      --accent: #f43f5e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header { background: #020617; padding: 1rem; text-align: center; border-bottom: 1px solid #334155; font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+    
+    .nav { display: flex; justify-content: center; gap: 8px; background: #0f172a; padding: 0.8rem; border-bottom: 1px solid #1e293b; overflow-x: auto; }
+    .nav button { background: transparent; border: 1px solid #334155; color: var(--text); padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: 0.3s; white-space: nowrap; }
+    .nav button.active, .nav button:hover { background: var(--primary); border-color: var(--primary); }
+
+    main { flex: 1; padding: 1.5rem; max-width: 600px; width: 100%; margin: 0 auto; }
+    .page { display: none; background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #334155; }
+    .page.active { display: block; }
+
+    h2 { margin-bottom: 1rem; color: var(--accent); }
+    .form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 0.9rem; color: var(--muted); }
+    input, select, textarea { padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; width: 100%; }
+    
+    .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1rem; font-weight: bold; }
+    .btn:hover { background: var(--accent); }
+
+    .room-card { background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .room-card:hover { border-color: var(--primary); }
+
+    .chat-box { height: 300px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; padding: 10px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { background: #1e293b; padding: 8px 12px; border-radius: 8px; max-width: 80%; width: fit-content; }
+    .msg-user { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 2px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>شات غرام قلبي</h1>
-        <p>أهلاً بك في عالم التواصل والتفاعل</p>
-        <button class="btn" onclick="alert('مرحباً بك! سنتعلم قريباً كيف نربط هذا الزر بصفحة التسجيل.')">دخول الشات</button>
-    </div>
+
+  <header>شات غرام قلبي 💬</header>
+
+  <nav class="nav">
+    <button onclick="showPage('home')" id="nav-home" class="active">الرئيسية</button>
+    <button onclick="showPage('login')" id="nav-login">الدخول</button>
+    <button onclick="showPage('register')" id="nav-register">تسجيل حساب</button>
+    <button onclick="showPage('rooms')" id="nav-rooms">الغرف</button>
+    <button onclick="showPage('profile')" id="nav-profile">الملف الشخصي</button>
+  </nav>
+
+  <main>
+    <!-- 1. الصفحة الرئيسية -->
+    <section id="home" class="page active">
+      <h2>أهلاً بك في شات غرام قلبي</h2>
+      <p style="margin-bottom: 1.5rem; color: var(--muted);">المكان الأفضل للتعرف والتواصل العربي الراقي.</p>
+      <button class="btn" onclick="showPage('register')">أنشئ حسابك الآن وابدأ الشات</button>
+    </section>
+
+    <!-- 2. تسجيل الدخول -->
+    <section id="login" class="page">
+      <h2>تسجيل الدخول</h2>
+      <div class="form-group">
+        <label>اسم المستخدم</label>
+        <input type="text" id="login-username" placeholder="اكتب اسمك">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" id="login-password" placeholder="••••••••">
+      </div>
+      <button class="btn" onclick="showPage('rooms')">دخول</button>
+    </section>
+
+    <!-- 3. إنشاء حساب -->
+    <section id="register" class="page">
+      <h2>إنشاء حساب جديد</h2>
+      <div class="form-group">
+        <label>اسم المستخدم</label>
+        <input type="text" id="reg-username" placeholder="مثال: خالد">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" id="reg-password">
+      </div>
+      <div class="form-group">
+        <label>العمر</label>
+        <input type="number" id="reg-age" placeholder="20">
+      </div>
+      <div class="form-group">
+        <label>النوع</label>
+        <select id="reg-gender">
+          <option>ذكر</option>
+          <option>أنثى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>نبذة شخصية</label>
+        <textarea id="reg-bio" placeholder="اكتب القليل عن نفسك..."></textarea>
+      </div>
+      <button class="btn" onclick="showPage('profile')">إنشاء الحساب</button>
+    </section>
+
+    <!-- 4. الغرف -->
+    <section id="rooms" class="page">
+      <h2>غرف الشات الحية</h2>
+      <div class="room-card" onclick="enterRoom('💬 الغرفة العامة')">
+        <span>💬 الغرفة العامة</span>
+        <small style="color:var(--muted)">ادخل الآن</small>
+      </div>
+      <div class="room-card" onclick="enterRoom('🌙 غرفة السهر')">
+        <span>🌙 غرفة السهر</span>
+        <small style="color:var(--muted)">ادخل الآن</small>
+      </div>
+      <div class="room-card" onclick="enterRoom('🎀 غرفة البنات')">
+        <span>🎀 غرفة البنات</span>
+        <small style="color:var(--muted)">ادخل الآن</small>
+      </div>
+      <div class="room-card" onclick="enterRoom('🎮 غرفة الترفيه')">
+        <span>🎮 غرفة الترفيه</span>
+        <small style="color:var(--muted)">ادخل الآن</small>
+      </div>
+    </section>
+
+    <!-- 5. واجهة الشات -->
+    <section id="chat" class="page">
+      <h2 id="current-room-title">الغرفة</h2>
+      <div class="chat-box" id="chat-messages">
+        <div class="msg"><div class="msg-user">النظام</div>مرحباً بك في الغرفة!</div>
+      </div>
+      <div style="display:flex; gap: 8px;">
+        <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا...">
+        <button class="btn" style="width: 80px;" onclick="sendMsg()">إرسال</button>
+      </div>
+    </section>
+
+    <!-- 6. الملف الشخصي -->
+    <section id="profile" class="page">
+      <h2>الملف الشخصي</h2>
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:2rem;">👤</div>
+        <h3 id="prof-name">اسم المستخدم</h3>
+        <p style="color:var(--muted); font-size:0.9rem;" id="prof-info">العمر: -- | الجنس: --</p>
+      </div>
+      <div class="form-group">
+        <label>النبذة الشخصية</label>
+        <p id="prof-bio" style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155;">أهلاً بكم في بروفايلي</p>
+      </div>
+      <button class="btn" onclick="alert('سيتم تفعيل حفظ التعديلات في الخطوة القادمة')">تعديل الملف الشخصي</button>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://zhbndfuzqoavotgxkqvc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_8frWX1wu0lE6CTJTroly-w";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      
+      const targetPage = document.getElementById(pageId);
+      if(targetPage) targetPage.classList.add('active');
+      
+      const targetBtn = document.getElementById('nav-' + pageId);
+      if(targetBtn) targetBtn.classList.add('active');
+    }
+
+    function enterRoom(roomName) {
+      document.getElementById('current-room-title').innerText = roomName;
+      showPage('chat');
+    }
+
+    function sendMsg() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if(!text) return;
+      
+      const msgBox = document.getElementById('chat-messages');
+      const newMsg = document.createElement('div');
+      newMsg.className = 'msg';
+      newMsg.innerHTML = `<div class="msg-user">أنت</div>${text}`;
+      msgBox.appendChild(newMsg);
+      msgBox.scrollTop = msgBox.scrollHeight;
+      input.value = '';
+    }
+  </script>
 </body>
 </html>
 
